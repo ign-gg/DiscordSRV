@@ -1164,7 +1164,7 @@ public class DiscordSRV extends JavaPlugin {
         if (pluginHooks.stream().noneMatch(pluginHook -> pluginHook instanceof ChatHook)) {
             DiscordSRV.debug(Debug.UNCATEGORIZED, LangUtil.InternalMessage.NO_CHAT_PLUGIN_HOOKED.toString());
 
-            try {
+            /*try {
                 Class.forName("io.papermc.paper.event.player.AsyncChatEvent");
 
                 getServer().getPluginManager().registerEvents(new ModernPlayerChatListener(), this);
@@ -1197,7 +1197,8 @@ public class DiscordSRV extends JavaPlugin {
                 registerLegacy.run();
             }
 
-            debug(Debug.MINECRAFT_TO_DISCORD, "Modern PlayerChatEvent (Paper) is " + (modernChatEventAvailable ? "" : "not ") + "available");
+            debug(Debug.MINECRAFT_TO_DISCORD, "Modern PlayerChatEvent (Paper) is " + (modernChatEventAvailable ? "" : "not ") + "available");*/
+            getServer().getPluginManager().registerEvents(new /*Modern*/PlayerChatListener(), this);
         }
         pluginHooks.add(new VanishHook() {
             @Override

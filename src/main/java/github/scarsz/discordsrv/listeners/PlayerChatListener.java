@@ -24,6 +24,7 @@ package github.scarsz.discordsrv.listeners;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -34,9 +35,20 @@ public class PlayerChatListener implements Listener {
     @SuppressWarnings("deprecation") // legacy
     @EventHandler(priority = EventPriority.MONITOR)
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        if (DiscordSRV.config().getBooleanElse("UseModernPaperChatEvent", false)
+        /*if (DiscordSRV.config().getBooleanElse("UseModernPaperChatEvent", false)
                 && DiscordSRV.getPlugin().isModernChatEventAvailable()) {
             return;
+        }*/
+
+        if (event.isCancelled()) {
+            return;
+        }
+
+        event.setCancelled(true);
+        String message = String.format(event.getFormat(), event.getPlayer().getDisplayName(), event.getMessage());
+        Bukkit.getServer().getLogger().info(message);
+        for (Player recipient : event.getRecipients()) {
+            recipient.sendMessage(message);
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(DiscordSRV.getPlugin(), () ->
@@ -44,7 +56,7 @@ public class PlayerChatListener implements Listener {
                         event.getPlayer(),
                         event.getMessage(),
                         DiscordSRV.getPlugin().getOptionalChannel("global"),
-                        event.isCancelled()
+                        false //event.isCancelled()
                 )
         );
     }
