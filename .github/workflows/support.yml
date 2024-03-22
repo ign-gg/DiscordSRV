@@ -1,0 +1,20 @@
+name: 'Support Requests'
+on:
+  issues:
+    types: [labeled, unlabeled, reopened]
+permissions:
+  issues: write
+jobs:
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dessant/support-requests@v3.0.0
+        with:
+          support-label: 'support'
+          close-issue: true
+          lock-issue: false
+          issue-lock-reason: 'off-topic'
+          issue-comment: >
+            We use the issue tracker exclusively for bug reports and feature requests.
+            However, this issue appears to be a support request.
+            Please join our Discord at https://discordsrv.com/discord and go to the #create-a-ticket channel for help with installing or configuring DiscordSRV.

@@ -1,30 +1,28 @@
-/*-
- * LICENSE
- * DiscordSRV
- * -------------
- * Copyright (C) 2016 - 2021 Austin "Scarsz" Shapiro
- * -------------
+/*
+ * DiscordSRV - https://github.com/DiscordSRV/DiscordSRV
+ *
+ * Copyright (C) 2016 - 2024 Austin "Scarsz" Shapiro
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * END
  */
 
 package github.scarsz.discordsrv.objects.managers;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.util.LangUtil;
-import org.bukkit.Bukkit;
+import github.scarsz.discordsrv.util.SchedulerUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,7 +36,6 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -65,9 +62,9 @@ public class IncompatibleClientManager implements PluginMessageListener, Listene
         if (CLIENT_BRAND_NAME_METHOD == null) return;
 
         // Client brand is not available during this time, so we run check brand 2s and 10s after this point
-        Bukkit.getScheduler().runTaskLaterAsynchronously(
+        SchedulerUtil.runTaskLaterAsynchronously(
                 DiscordSRV.getPlugin(), () -> checkBrand(event.getPlayer()), 40L);
-        Bukkit.getScheduler().runTaskLaterAsynchronously(
+        SchedulerUtil.runTaskLaterAsynchronously(
                 DiscordSRV.getPlugin(), () -> checkBrand(event.getPlayer()), 200L);
     }
 
@@ -83,10 +80,10 @@ public class IncompatibleClientManager implements PluginMessageListener, Listene
             return;
         }
 
-        if (brand != null && brand.toLowerCase(Locale.ROOT).startsWith("lunarclient")) {
-            addIncompatible(player, "LunarClient");
-            DiscordSRV.debug("Detected client brand: " + brand + " for " + player.getName());
-        }
+//        if (brand != null && brand.toLowerCase(Locale.ROOT).startsWith("lunarclient")) {
+//            addIncompatible(player, "LunarClient");
+//            DiscordSRV.debug("Detected client brand: " + brand + " for " + player.getName());
+//        }
     }
 
     @Override
@@ -95,11 +92,11 @@ public class IncompatibleClientManager implements PluginMessageListener, Listene
     }
 
     private void checkChannel(Player player, String channel, boolean register) {
-        if (channel.toLowerCase(Locale.ROOT).startsWith("lunarclient")) {
-            addIncompatible(player, "LunarClient");
-            DiscordSRV.debug("Received " + (register ? "message channel register" : "plugin message")
-                                     + " from channel " + channel + " for " + player.getName());
-        }
+//        if (channel.toLowerCase(Locale.ROOT).startsWith("lunarclient")) {
+//            addIncompatible(player, "LunarClient");
+//            DiscordSRV.debug("Received " + (register ? "message channel register" : "plugin message")
+//                                     + " from channel " + channel + " for " + player.getName());
+//        }
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -123,4 +120,5 @@ public class IncompatibleClientManager implements PluginMessageListener, Listene
     public void onPlayerQuit(PlayerQuitEvent event) {
         incompatibleClients.remove(event.getPlayer().getUniqueId());
     }
+
 }
