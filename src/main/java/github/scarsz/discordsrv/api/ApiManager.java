@@ -78,7 +78,7 @@ public class ApiManager extends ListenerAdapter {
 
     private final EnumSet<GatewayIntent> intents = EnumSet.of(
             // required for DiscordSRV's use
-            GatewayIntent.GUILD_MEMBERS,
+            //GatewayIntent.GUILD_MEMBERS,
             GatewayIntent.GUILD_BANS,
             GatewayIntent.GUILD_EMOJIS,
             GatewayIntent.GUILD_VOICE_STATES,

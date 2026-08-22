@@ -15,7 +15,7 @@ plugins {
 
 group = "com.discordsrv"
 val minecraftVersion = project.properties["minecraftVersion"]!!.toString()
-val paperApiVersion = project.properties["paperVersion"]!!.toString()
+//val paperApiVersion = project.properties["paperVersion"]!!.toString()
 val targetJavaVersion = 1.8
 
 java {
@@ -191,7 +191,8 @@ repositories {
 
 dependencies {
     // Paper API
-    compileOnly("io.papermc.paper:paper-api:${paperApiVersion}") {
+    compileOnly("io.papermc.paper:paper-api:${minecraftVersion}-R0.1-SNAPSHOT") {
+    //compileOnly("io.papermc.paper:paper-api:${paperApiVersion}") {
         exclude("commons-lang") // Exclude lang in favor of our own lang3
     }
 
@@ -301,7 +302,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.14.3")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.14.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.14.3")
-    testImplementation("io.papermc.paper:paper-api:${paperApiVersion}")
+    //testImplementation("io.papermc.paper:paper-api:${paperApiVersion}")
+    testImplementation("io.papermc.paper:paper-api:${minecraftVersion}-R0.1-SNAPSHOT")
 }
 
 tasks {

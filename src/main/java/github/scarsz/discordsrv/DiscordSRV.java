@@ -72,7 +72,6 @@ import net.dv8tion.jda.api.requests.CloseCode;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
-import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -883,7 +882,7 @@ public class DiscordSRV extends JavaPlugin {
             jda = JDABuilder.create(api.getIntents())
                     // we disable anything that isn't enabled (everything is enabled by default)
                     .disableCache(Arrays.stream(CacheFlag.values()).filter(cacheFlag -> !api.getCacheFlags().contains(cacheFlag)).collect(Collectors.toList()))
-                    .setMemberCachePolicy(MemberCachePolicy.ALL)
+                    //.setMemberCachePolicy(MemberCachePolicy.ALL)
                     .setCallbackPool(callbackThreadPool, false)
                     .setGatewayPool(gatewayThreadPool, true)
                     .setRateLimitPool(rateLimitThreadPool, true)
@@ -893,24 +892,24 @@ public class DiscordSRV extends JavaPlugin {
                     .setBulkDeleteSplittingEnabled(false)
                     .setEnableShutdownHook(false)
                     .setToken(token)
-                    .addEventListeners(new DiscordBanListener())
+                    //.addEventListeners(new DiscordBanListener())
                     .addEventListeners(new DiscordChatListener())
-                    .addEventListeners(new DiscordConsoleListener())
-                    .addEventListeners(new DiscordAccountLinkListener())
-                    .addEventListeners(new DiscordDisconnectListener())
+                    //.addEventListeners(new DiscordConsoleListener())
+                    //.addEventListeners(new DiscordAccountLinkListener())
+                    //.addEventListeners(new DiscordDisconnectListener())
                     .addEventListeners(api)
                     .addEventListeners(groupSynchronizationManager)
                     .setContextEnabled(false)
                     .build();
             jda.awaitReady(); // let JDA be assigned as soon as we can, but wait until it's ready
 
-            for (Guild guild : jda.getGuilds()) {
+            /*for (Guild guild : jda.getGuilds()) {
                 guild.retrieveOwner(true).queue();
                 guild.loadMembers()
                         .onSuccess(members -> DiscordSRV.debug("Loaded " + members.size() + " members in guild " + guild))
                         .onError(throwable -> DiscordSRV.error("Failed to retrieve members of guild " + guild, throwable))
                         .get(); // block DiscordSRV startup until members are loaded
-            }
+            }*/
         } catch (LoginException e) {
             disablePlugin();
             if (e.getMessage().toLowerCase().contains("the provided token is invalid")) {
