@@ -25,7 +25,6 @@ import org.bukkit.Bukkit;
 import github.scarsz.discordsrv.Debug;
 import github.scarsz.discordsrv.DiscordSRV;
 import org.bukkit.entity.Player;
-import org.bukkit.advancement.Advancement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -43,11 +42,13 @@ public class NMSUtil {
     protected static boolean failed = false;
 
     protected static Class<?> class_CraftPlayer;
+    protected static Class<?> class_ResolvableProfile;
     protected static Class<?> class_GameProfile;
     protected static Class<?> class_GameProfileProperty;
     protected static Class<?> class_EntityPlayer;
     protected static Class<?> class_Advancement;
     protected static Method method_CraftPlayer_getHandle;
+    protected static Method method_ResolvableProfile_partialProfile;
     protected static Method method_EntityPlayer_getGameProfile;
     protected static Method method_GameProfile_getProperties;
     protected static Method method_Advancement_getHandle;
@@ -75,19 +76,30 @@ public class NMSUtil {
                 }
             }
 
-            class_Advancement = fixBukkitClass("org.bukkit.craftbukkit.advancement.CraftAdvancement");
-            method_Advancement_getHandle = class_Advancement.getMethod("getHandle");
+            try {
+                class_Advancement = fixBukkitClass("org.bukkit.craftbukkit.advancement.CraftAdvancement");
+                method_Advancement_getHandle = class_Advancement.getMethod("getHandle");
+            } catch (ClassNotFoundException ex) {
+                // Unsupported on the server
+            }
 
             class_CraftPlayer = fixBukkitClass("org.bukkit.craftbukkit.entity.CraftPlayer");
             method_CraftPlayer_getHandle = class_CraftPlayer.getMethod("getHandle");
 
-            class_GameProfile = getClass("com.mojang.authlib.GameProfile");
+            class_ResolvableProfile = getClass("net.minecraft.world.item.component.ResolvableProfile");
             class_GameProfileProperty = getClass("com.mojang.authlib.properties.Property");
+            class_GameProfile = getClass("com.mojang.authlib.GameProfile");
             if (class_GameProfile == null) {
                 class_GameProfile = getClass("net.minecraft.util.com.mojang.authlib.GameProfile");
                 class_GameProfileProperty = getClass("net.minecraft.util.com.mojang.authlib.properties.Property");
             }
-            method_GameProfile_getProperties = class_GameProfile.getMethod("getProperties");
+
+            method_ResolvableProfile_partialProfile = getMethod(class_ResolvableProfile, "partialProfile");
+            method_GameProfile_getProperties = getMethod(class_GameProfile, "getProperties");
+            if (method_GameProfile_getProperties == null) {
+                method_GameProfile_getProperties = getMethod(class_GameProfile, "properties");
+            }
+
             field_GameProfileProperty_value = class_GameProfileProperty.getDeclaredField("value");
             field_GameProfileProperty_value.setAccessible(true);
             field_PropertyMap_properties = method_GameProfile_getProperties.getReturnType().getDeclaredField("properties");
@@ -103,6 +115,14 @@ public class NMSUtil {
         Class<?> result = null;
         try {
             result = NMSUtil.class.getClassLoader().loadClass(className);
+        } catch (Exception ignored) {}
+        return result;
+    }
+
+    public static Method getMethod(Class<?> methodClass, String methodName) {
+        Method result = null;
+        try {
+            result = methodClass.getMethod(methodName);
         } catch (Exception ignored) {}
         return result;
     }
@@ -141,7 +161,7 @@ public class NMSUtil {
         return null;
     }
 
-    public static Object getGameProfile(Player player) {
+    public static Object getGameProfileOrResolvableProfile(Player player) {
         if (failed) return null;
 
         Object handle = getHandle(player);
@@ -177,8 +197,11 @@ public class NMSUtil {
         if (failed) return null;
 
         try {
-            Object profile = getGameProfile(player);
+            Object profile = getGameProfileOrResolvableProfile(player);
             if (profile == null) return null;
+            if (class_ResolvableProfile.isInstance(profile)) {
+                profile = method_ResolvableProfile_partialProfile.invoke(profile);
+            }
             Object propertyMap = method_GameProfile_getProperties.invoke(profile);
             Object textureProperty = getTextureProperty(propertyMap);
             if (textureProperty != null) {
@@ -193,8 +216,8 @@ public class NMSUtil {
         return null;
     }
 
-    public static Object getHandle(Advancement advancement) {
-        if (failed) return null;
+    public static Object getHandle(Object advancement) {
+        if (failed || method_Advancement_getHandle == null) return null;
 
         try {
             return method_Advancement_getHandle.invoke(advancement);
